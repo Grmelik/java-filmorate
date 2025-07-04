@@ -25,7 +25,7 @@ public class FilmController {
     private final LocalDate birthdayCinema = LocalDate.of(1895, 12, 28);
 
     private boolean isPositiveDuration(Integer duration) {
-        if (duration > 0 )
+        if (duration > 0)
             return true;
         return false;
     }
