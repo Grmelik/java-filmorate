@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -16,7 +18,7 @@ public class FilmControllerTest {
     @BeforeEach
     public void prepareTests() {
         film = new Film(1L,"Film first", "Film first description",
-                LocalDate.of(2025, 01, 01), 120);
+                LocalDate.of(2025, 01, 01), 120, null);
     }
 
     @Test
@@ -61,10 +63,11 @@ public class FilmControllerTest {
     @Test
     void testGetFilms() {
         System.out.println("==== Проверка получения карточек 3-х фильмов ============================================");
-        FilmController fc = new FilmController();
+        //FilmController fc = new FilmController();
+        InMemoryFilmStorage fc = new InMemoryFilmStorage();
 
         Film film2 = new Film(2L,"Film second", "Film second description",
-                LocalDate.of(2020, 11, 21), 240);
+                LocalDate.of(2020, 11, 21), 240, null);
 
         Film film3 = new Film();
         film3.setName("Film third");

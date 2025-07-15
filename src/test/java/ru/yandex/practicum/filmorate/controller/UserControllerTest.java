@@ -5,13 +5,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
 
 public class UserControllerTest {
     User user;
-    UserController uc; // = new UserController();
+    //UserController uc = new UserController();
+    InMemoryUserStorage us = new InMemoryUserStorage();
 
     @BeforeEach
     public void prepareTests() {
@@ -21,7 +24,7 @@ public class UserControllerTest {
     @Test
     void testCreate() {
         System.out.println("==== Проверка создания пользователя =====================================================");
-        User userView = uc.create(user);
+        User userView = us.create(user);
         Assertions.assertEquals(1, userView.getId(), "Ошибка создания пользователя");
 
         System.out.println("==== Проверка пустой электронной почты ==================================================");
@@ -44,9 +47,9 @@ public class UserControllerTest {
     void testGetUsers() {
         System.out.println("==== Проверка просмотра пользователей ===================================================");
         User user2 = new User(2L, "user2@test.ru", "usertwo", "User Two", LocalDate.of(1981, 03, 25), null);
-        uc.create(user);
-        uc.create(user2);
-        Collection<User> users = uc.findAll();
+        us.create(user);
+        us.create(user2);
+        Collection<User> users = us.findAll();
         Assertions.assertEquals(2, users.size(), "Должно быть 2 пользователя");
     }
 }
