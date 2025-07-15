@@ -11,11 +11,11 @@ import java.util.Collection;
 
 public class UserControllerTest {
     User user;
-    UserController uc = new UserController();
+    UserController uc; // = new UserController();
 
     @BeforeEach
     public void prepareTests() {
-        user = new User(1L, "user@test.com", "userone", "User One", LocalDate.of(1980, 03, 25));
+        user = new User(1L, "user@test.com", "userone", "User One", LocalDate.of(1980, 03, 25), null);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class UserControllerTest {
     @Test
     void testGetUsers() {
         System.out.println("==== Проверка просмотра пользователей ===================================================");
-        User user2 = new User(2L, "user2@test.ru", "usertwo", "User Two", LocalDate.of(1981, 03, 25));
+        User user2 = new User(2L, "user2@test.ru", "usertwo", "User Two", LocalDate.of(1981, 03, 25), null);
         uc.create(user);
         uc.create(user2);
         Collection<User> users = uc.findAll();
