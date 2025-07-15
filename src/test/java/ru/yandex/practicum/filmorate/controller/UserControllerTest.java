@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
