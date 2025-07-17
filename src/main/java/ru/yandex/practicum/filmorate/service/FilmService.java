@@ -64,13 +64,7 @@ public class FilmService {
 
     public Collection<Film> getFilmsTop(int count) {
         log.info("Топ-{} популярных фильмов.", count);
-        Collection<Film> films = findAll();
-
-        if (films == null) {
-            return Collections.emptyList();
-        }
-
-        return films
+        return filmStorage.findAll()
                 .stream()
                 .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
                 .limit(count)
