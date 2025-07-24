@@ -2,7 +2,7 @@
 
 https://app.quickdatabasediagrams.com/#/d/UlRdt2
 
-![Untitled (1)](https://github.com/Grmelik/add-database/blob/main/Schema.jpg)
+![Untitled (1)](https://github.com/Grmelik/java-filmorate/blob/add-database/Schema.jpg)
 
 **_База данных хранит в себе данные о фильмах, их жанрах и рейтингах, а также о пользователях, их друзьях и лайках._**
 
