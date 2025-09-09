@@ -42,11 +42,6 @@ public abstract class BaseRepository<T> {
         return List.of();
     }
 
-    public boolean delete(String query, Map<String, ?> params) {
-        int rowsDeleted = jdbc.update(query, params);
-        return rowsDeleted > 0;
-    }
-
     protected long insert(String query, Map<String, ?> params) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(query, new MapSqlParameterSource(params), keyHolder);
@@ -72,6 +67,22 @@ public abstract class BaseRepository<T> {
         }
         if (rowsUpdated == 0) {
             throw new InternalServerException("Не удалось обновить данные");
+        }
+    }
+
+    protected void delete(String query, Map<String, ?> params) {
+        int rowsDeleted = 0;
+        try {
+            rowsDeleted = jdbc.update(query, params);
+        } catch (DataAccessException e) {
+            log.error("Ошибка удаления данных: {}", query, e);
+            Throwable rootCause = e.getRootCause();
+            if (rootCause != null) {
+                log.info("Root cause delete: {}", rootCause.getMessage());
+            }
+        }
+        if (rowsDeleted == 0) {
+            throw new InternalServerException("Не удалось удалить данные");
         }
     }
 }

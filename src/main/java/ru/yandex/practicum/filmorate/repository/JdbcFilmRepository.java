@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -26,44 +25,46 @@ import java.util.Set;
 @Repository
 @Qualifier("FilmRepository")
 public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepository {
-    private static final String FIND_ALL_QUERY =
-            "SELECT f.film_id, f.film_name, f.description, f.releasedate, f.duration, r.rating_id, r.rating_name" +
-            " FROM films f" +
-            " LEFT JOIN ratings r ON f.rating_id = r.rating_id" +
-            " ORDER BY f.film_id";
-    private static final String FIND_BY_ID_QUERY =
-            "SELECT f.film_id, f.film_name, f.description, f.releasedate, f.duration, r.rating_id, r.rating_name" +
-            " FROM films f" +
-            " LEFT JOIN ratings r ON f.rating_id = r.rating_id" +
-            " WHERE f.film_id = :filmId";
-    private static final String FIND_FILMS_TOP =
-            "SELECT f.film_id, f.film_name, f.description, f.releasedate, f.duration, r.rating_id, r.rating_name," +
-            " count(l.user_id) cnt" +
-            " FROM films f" +
-            " JOIN ratings r ON f.rating_id = r.rating_id" +
-            " LEFT JOIN likes l ON f.film_id = l.film_id" +
-            " GROUP BY f.film_id, f.film_name, f.description, f.releasedate, f.duration, r.rating_id, r.rating_name" +
-            " ORDER BY cnt DESC, releasedate" +
-            " LIMIT :count";
-    private static final String INSERT_QUERY =
-            "INSERT INTO films(film_name, description, releasedate, duration, rating_id)" +
-            " VALUES (:filmName, :description, :releasedate, :duration, :ratingId)";
-    private static final String UPDATE_QUERY =
-            "UPDATE films" +
-            " SET film_name = :filmName, description = :description, releasedate = :releasedate," +
-            " duration = :duration, rating_id = :ratingId" +
-            " WHERE film_id = :filmId";
+    private static final String FIND_ALL_QUERY = """
+            SELECT f.film_id, f.film_name, f.description, f.release_date, f.duration, r.rating_id, r.rating_name
+             FROM films f
+             LEFT JOIN ratings r ON f.rating_id = r.rating_id
+             ORDER BY f.film_id
+            """;
+    private static final String FIND_BY_ID_QUERY = """
+             SELECT f.film_id, f.film_name, f.description, f.release_date, f.duration, r.rating_id, r.rating_name, 
+             STRING_AGG(g.genre_name, ', ') AS genre_name
+             FROM films f
+             LEFT JOIN ratings r ON f.rating_id = r.rating_id
+             LEFT JOIN film_genres fg ON f.film_id = fg.film_id
+             LEFT JOIN genres g ON fg.genre_id = g.genre_id
+             WHERE f.film_id = :filmId
+             GROUP BY f.film_id, f.film_name, f.description, f.release_date, f.duration, r.rating_id, r.rating_name
+             """;
+    private static final String FIND_FILMS_TOP = """
+            SELECT f.film_id, f.film_name, f.description, f.release_date, f.duration, r.rating_id, r.rating_name,
+             count(l.user_id) cnt
+             FROM films f
+             JOIN ratings r ON f.rating_id = r.rating_id
+             LEFT JOIN likes l ON f.film_id = l.film_id
+             GROUP BY f.film_id, f.film_name, f.description, f.release_date, f.duration, r.rating_id, r.rating_name
+             ORDER BY cnt DESC, release_date
+             LIMIT :count
+             """;
+    private static final String INSERT_QUERY = """
+            INSERT INTO films(film_name, description, release_date, duration, rating_id)
+             VALUES (:filmName, :description, :releaseDate, :duration, :ratingId)
+            """;
+    private static final String UPDATE_QUERY = """
+            UPDATE films
+             SET film_name = :filmName, description = :description, release_date = :releaseDate,
+             duration = :duration, rating_id = :ratingId
+             WHERE film_id = :filmId
+            """;
     private static final String DELETE_QUERY = "DELETE FROM films WHERE film_id = :filmId";
     private static final String GET_NEXT_ID_QUERY = "SELECT COALESCE(MAX(film_id), 0) + 1 FROM films";
     private static final String FILL_FILM_GENRES = "INSERT INTO film_genres(film_id, genre_id) VALUES(?, ?)";
     private static final String CLEAN_FILM_GENRES = "DELETE from film_genres WHERE film_id = :filmId";
-
-    private final GenreRepository genreRepository;
-
-    public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper, GenreRepository genreRepository) {
-        super(jdbc, mapper);
-        this.genreRepository = genreRepository;
-    }
 
     @Override
     public Film create(Film film) {
@@ -72,7 +73,7 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
         Map<String, Object> params = new HashMap<>();
         params.put("filmName", film.getFilmName());
         params.put("description", film.getDescription());
-        params.put("releasedate", film.getReleaseDate());
+        params.put("releaseDate", film.getReleaseDate());
         params.put("duration", film.getDuration());
         params.put("ratingId", film.getMpa() != null ? film.getMpa().getRatingId() : null);
 
@@ -80,6 +81,10 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
         film.setFilmId(filmId);
         fillGenresTable(film.getFilmId(), film.getGenres());
         return film;
+    }
+
+    public JdbcFilmRepository(NamedParameterJdbcOperations jdbc, RowMapper<Film> mapper) {
+        super(jdbc, mapper);
     }
 
     @Override
@@ -98,7 +103,7 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
         params.put("filmId", newFilm.getFilmId());
         params.put("filmName", newFilm.getFilmName());
         params.put("description", newFilm.getDescription());
-        params.put("releasedate", newFilm.getReleaseDate());
+        params.put("releaseDate", newFilm.getReleaseDate());
         params.put("duration", newFilm.getDuration());
         params.put("ratingId", newFilm.getMpa() != null ? newFilm.getMpa().getRatingId() : null);
 
@@ -141,33 +146,18 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
         if (filmId == null) {
             return Optional.empty();
         }
-
-        log.debug("Executing SQL: {} with filmId: {}", FIND_BY_ID_QUERY, filmId);
-
         Map<String, Object> params = new HashMap<>();
         params.put("filmId", filmId);
-        //return findOne(FIND_BY_ID_QUERY, params);
-        try {
-            return findOne(FIND_BY_ID_QUERY, params)
-                    .map(film -> {
-                        film.setGenres(genreRepository.findByFilmId(filmId));
-                        return film;
-                    });
-        } catch (DataAccessException e) {
-            log.error("SQL error: {}", e.getMessage());
-            throw new RuntimeException("Database error", e);
-        }
+        return findOne(FIND_BY_ID_QUERY, params);
     }
 
     @Override
-    public boolean delete(Long filmId) {
-        if (filmId == null) {
-            return false;
+    public void delete(Long filmId) {
+        if (filmId != null) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("filmId", filmId);
+            delete(DELETE_QUERY, params);
         }
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("filmId", filmId);
-        return delete(DELETE_QUERY, params);
     }
 
     public void fillGenresTable(Long filmId, Set<Genre> genres) {

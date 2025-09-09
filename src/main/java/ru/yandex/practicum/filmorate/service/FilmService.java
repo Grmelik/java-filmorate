@@ -7,10 +7,13 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.DatabaseConstraintException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
 import ru.yandex.practicum.filmorate.repository.LikeRepository;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -27,6 +30,11 @@ public class FilmService {
 
         if (film.getMpa().getRatingId() == null) {
             film.setMpa(ratingService.findById(1L));
+        }
+
+        if (film.getGenres() != null) {
+            Set<Genre> uniqueGenres = new HashSet<>(film.getGenres());
+            film.setGenres(uniqueGenres);
         }
 
         try {

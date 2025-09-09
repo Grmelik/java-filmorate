@@ -44,8 +44,7 @@ class JdbcFilmRepositoryTest {
         Film afterUpdate = filmRepository.findById(created.getFilmId()).orElseThrow();
         assertThat(afterUpdate.getFilmName()).isEqualTo("Matrix Reloaded");
 
-        boolean deleted = filmRepository.delete(created.getFilmId());
-        assertThat(deleted).isTrue();
+        filmRepository.delete(created.getFilmId());
         assertThat(filmRepository.findById(created.getFilmId())).isEmpty();
     }
 }

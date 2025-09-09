@@ -39,7 +39,7 @@ SELECT gn.film_id,
  WHERE g.genre_id = gn.genre_id)
 
 SELECT film_name,
-       releasedate,
+       release_date,
        duration,
        (SELECT STRING_AGG(genre_name, ', ' ORDER BY genre_name) FROM t WHERE t.film_id = f.film_id) AS genres,
        description,

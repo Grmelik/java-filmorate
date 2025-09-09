@@ -18,13 +18,14 @@ import java.util.stream.Collectors;
 public class JdbcGenreRepository extends BaseRepository<Genre> implements GenreRepository {
     private static final String FIND_ALL_QUERY = "SELECT * FROM genres ORDER BY genre_id";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM genres WHERE genre_id = :genreId";
-    private static final String FIND_GENRES_OF_FILM =
-            "SELECT g.genre_id, g.genre_name" +
-            " FROM genres g" +
-            " JOIN film_genres fg" +
-            " ON g.genre_id = fg.genre_id" +
-            " WHERE fg.film_id = :filmId" +
-            " ORDER by g.genre_id";
+    private static final String FIND_GENRES_OF_FILM = """
+            SELECT g.genre_id, g.genre_name
+             FROM genres g
+             JOIN film_genres fg
+             ON g.genre_id = fg.genre_id
+             WHERE fg.film_id = :filmId
+             ORDER by g.genre_id
+            """;
 
     public JdbcGenreRepository(NamedParameterJdbcOperations jdbc, RowMapper<Genre> mapper) {
         super(jdbc, mapper);

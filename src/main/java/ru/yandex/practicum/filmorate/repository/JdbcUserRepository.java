@@ -20,13 +20,15 @@ import java.util.Optional;
 public class JdbcUserRepository extends BaseRepository<User> implements UserRepository {
     private static final String FIND_ALL_QUERY = "SELECT * FROM users ORDER BY user_id";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE user_id = :userId";
-    private static final String INSERT_QUERY =
-            "INSERT INTO users(login, user_name, email, birthday)" +
-            " VALUES (:login, :userName, :email, :birthday)";
-    private static final String UPDATE_QUERY =
-            "UPDATE users" +
-            " SET login = :login, user_name = :userName, email = :email, birthday = :birthday" +
-            " WHERE user_id = :userId";
+    private static final String INSERT_QUERY = """
+            INSERT INTO users(login, user_name, email, birthday)
+             VALUES (:login, :userName, :email, :birthday)
+            """;
+    private static final String UPDATE_QUERY = """
+            UPDATE users
+             SET login = :login, user_name = :userName, email = :email, birthday = :birthday
+             WHERE user_id = :userId
+            """;
     private static final String DELETE_QUERY = "DELETE FROM users WHERE user_id = :userId";
     private static final String GET_NEXT_ID_QUERY = "SELECT COALESCE(MAX(user_id), 0) + 1 FROM users";
 
@@ -37,13 +39,12 @@ public class JdbcUserRepository extends BaseRepository<User> implements UserRepo
     @Override
     public User create(User user) {
         validateUser(user);
-        log.info("create1, user.getUserName()={}", user.getUserName());
         Map<String, Object> params = new HashMap<>();
         params.put("login", user.getLogin());
         params.put("userName", user.getUserName());
         params.put("email", user.getEmail());
         params.put("birthday", user.getBirthday());
-        log.info("create1, params={}", params);
+        log.info("create, params={}", params);
         long id = insert(INSERT_QUERY, params);
         user.setUserId(id);
         return user;
@@ -102,14 +103,12 @@ public class JdbcUserRepository extends BaseRepository<User> implements UserRepo
     }
 
     @Override
-    public boolean delete(Long userId) {
-        if (userId == null) {
-            return false;
+    public void delete(Long userId) {
+        if (userId != null) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("userId", userId);
+            delete(DELETE_QUERY, params);
         }
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        return delete(DELETE_QUERY, params);
     }
 
     private void validateUser(User user) {

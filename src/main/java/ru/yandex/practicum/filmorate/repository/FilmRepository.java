@@ -18,5 +18,5 @@ public interface FilmRepository {
 
     Optional<Film> findById(Long filmId);
 
-    boolean delete(Long filmId);
+    void delete(Long filmId);
 }

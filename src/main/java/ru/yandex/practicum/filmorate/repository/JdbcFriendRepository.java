@@ -15,29 +15,34 @@ import java.util.Map;
 @Qualifier("friendRepository")
 @RequiredArgsConstructor
 public class JdbcFriendRepository implements FriendRepository {
-    private static final String FIND_BY_ID_QUERY =
-            "SELECT u.*" +
-            " FROM friends f" +
-            " JOIN users u ON f.friend_id = u.user_id" +
-            " WHERE f.user_id = :userId" +
-            " ORDER BY u.user_id";
-    private static final String INSERT_QUERY =
-            "INSERT INTO friends(user_id, friend_id, confirmed)" +
-            " VALUES (:userId, :friendId, TRUE)";
-    private static final String DELETE_QUERY =
-            "DELETE FROM friends" +
-            " WHERE user_id = :userId and friend_id = :friendId";
-    private static final String GET_STATUS_QUERY =
-            "SELECT COUNT(*)" +
-            " FROM friends" +
-            " WHERE user_id = :userId and friend_id = :friendId";
-    private static final String GET_COMMON_FRIENDS_QUERY =
-            "SELECT u.*" +
-            " FROM users u " +
-            " JOIN friends f1 ON u.user_id = f1.friend_id " +
-            " JOIN friends f2 ON u.user_id = f2.friend_id " +
-            " WHERE f1.user_id = :userId1 AND f2.user_id = :userId2 " +
-            " ORDER BY u.user_id";
+    private static final String FIND_BY_ID_QUERY = """
+            SELECT u.*
+             FROM friends f
+             JOIN users u ON f.friend_id = u.user_id
+             WHERE f.user_id = :userId
+             ORDER BY u.user_id
+            """;
+    private static final String INSERT_QUERY = """
+            INSERT INTO friends(user_id, friend_id, confirmed)
+             VALUES (:userId, :friendId, TRUE)
+            """;
+    private static final String DELETE_QUERY = """
+            DELETE FROM friends
+             WHERE user_id = :userId and friend_id = :friendId
+            """;
+    private static final String GET_STATUS_QUERY = """
+            SELECT COUNT(*)
+             FROM friends
+             WHERE user_id = :userId and friend_id = :friendId
+            """;
+    private static final String GET_COMMON_FRIENDS_QUERY = """
+            SELECT u.*
+             FROM users u
+             JOIN friends f1 ON u.user_id = f1.friend_id
+             JOIN friends f2 ON u.user_id = f2.friend_id
+             WHERE f1.user_id = :userId1 AND f2.user_id = :userId2
+             ORDER BY u.user_id
+            """;
 
     private final NamedParameterJdbcOperations jdbc;
     private final UserRowMapper userRowMapper;
