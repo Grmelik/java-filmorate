@@ -32,7 +32,7 @@ public class JdbcFilmRepository extends BaseRepository<Film> implements FilmRepo
              ORDER BY f.film_id
             """;
     private static final String FIND_BY_ID_QUERY = """
-             SELECT f.film_id, f.film_name, f.description, f.release_date, f.duration, r.rating_id, r.rating_name, 
+             SELECT f.film_id, f.film_name, f.description, f.release_date, f.duration, r.rating_id, r.rating_name,
              STRING_AGG(g.genre_name, ', ') AS genre_name
              FROM films f
              LEFT JOIN ratings r ON f.rating_id = r.rating_id
